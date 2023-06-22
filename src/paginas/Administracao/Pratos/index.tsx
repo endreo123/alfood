@@ -10,24 +10,25 @@ import {
     TableHead,
     TableRow,
 } from "@mui/material";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import { http } from "../../../http";
+import IPrato from "../../../interfaces/IPrato";
 
-export const AdministracaoRestaurante = () => {
-    const [restaurantes, setRestaurantes] = useState<IRestaurante[]>([]);
+export const Pratos = () => {
+    const [pratos, setPratos] = useState<IPrato[]>([]);
 
     useEffect(() => {
-        axios
-            .get<IRestaurante[]>("http://localhost:8000/api/v2/restaurantes/")
-            .then((response) => setRestaurantes(response.data))
+        http
+            .get<IPrato[]>("pratos/")
+            .then((response) => setPratos(response.data))
             .catch((error) => console.log(error));
     }, []);
 
-    const excluir = (restauranteAhSerExcluido: IRestaurante) => {
-        axios.delete(`http://localhost:8000/api/v2/restaurantes/${restauranteAhSerExcluido.id}/`)
+    const excluir = (pratosAhSerExcluido: IPrato) => {
+        http.delete(`restaurantes/${pratosAhSerExcluido.id}/`)
             .then(() => {
-                const listaRestaurante = restaurantes.filter(restaurante => restaurante.id !== restauranteAhSerExcluido.id);
-                setRestaurantes(listaRestaurante);
+                const listaPratos = pratos.filter(pratos => pratos.id !== pratosAhSerExcluido.id);
+                setPratos(listaPratos);
             })
             .catch(error => console.log(error));
     }
@@ -38,22 +39,28 @@ export const AdministracaoRestaurante = () => {
                 <TableHead>
                     <TableRow>
                         <TableCell>Nome</TableCell>
+                        <TableCell>Tag</TableCell>
+                        <TableCell>Imagem</TableCell>
                         <TableCell>Editar</TableCell>
                         <TableCell>Excluir</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {restaurantes?.map((restaurante) => (
-                        <TableRow key={restaurante.id}>
-                            <TableCell>{restaurante.nome}</TableCell>
+                    {pratos?.map((prato) => (
+                        <TableRow key={prato.id}>
+                            <TableCell>{prato.nome}</TableCell>
+                            <TableCell>{prato.tag}</TableCell>
                             <TableCell>
-                                [<Link to={`/admin/restaurantes/${restaurante.id}`}> Editar </Link>]
+                                [<a rel="noreferrer" href={prato.imagem} target="_blank"> Ver Imagem </a>]
+                            </TableCell>
+                            <TableCell>
+                                [<Link to={`/admin/prato/${prato.id}`}> Editar </Link>]
                             </TableCell>
                             <TableCell>
                                 <Button 
                                     variant="outlined" 
                                     color="error"
-                                    onClick={() => excluir(restaurante)}
+                                    onClick={() => excluir(prato)}
                                 >
                                     Excluir
                                 </Button>
